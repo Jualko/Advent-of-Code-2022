@@ -1,3 +1,5 @@
+//Part 1: What would your total score be if everything goes exactly according to your strategy guide?
+
 const fs = require('fs');
 const mPoints = {
     "X" : 1, //rock
@@ -23,7 +25,7 @@ aStrategyGuide.forEach(e => {
 
 console.log(points);
 
-// *** Part 2 ***
+//Part 2: Following the Elf's instructions for the second column, what would your total score be if everything goes exactly according to your strategy guide?
 
 const mPoints2 = {
     //A rock, B paper, C scissors, X lose, Y draw, Z win
