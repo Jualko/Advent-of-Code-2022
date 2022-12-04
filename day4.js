@@ -14,7 +14,7 @@ console.log("Part 1: " + aPairs.filter(e => doesContain(e[0], e[1])).length);
 
 //Part 2: In how many assignment pairs do the ranges overlap?
 function doesOverlap(aA, aB) {
-    return doesContain(aA, aB) || (aB[0] <= aA[1] && aB[0] >= aA[0]) || (aA[0] <= aB[1] && aA[0] >= aB[0]);
+    return (aB[0] <= aA[1] && aB[0] >= aA[0]) || (aA[0] <= aB[1] && aA[0] >= aB[0]);
 }
 
 console.log("Part 2: " + aPairs.filter(e => doesOverlap(e[0], e[1])).length);
