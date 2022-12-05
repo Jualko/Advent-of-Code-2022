@@ -48,3 +48,20 @@ function getTops(aStacks){
 }
 
 console.log("Part 1: " + getTops(moveCrates9000(createStacks())));
+
+//Part 2: After the rearrangement procedure completes, what crate ends up on top of each stack?
+
+function moveCrates9001(aStacks){
+    for (let i = 0; i < aMoves.length; i++) {
+        const oMove = aMoves[i];
+        for (let j = oMove.amount; j > 0; j--) {
+            aStacks[oMove.to].push(aStacks[oMove.from][aStacks[oMove.from].length - j]);
+        }
+        for (let j = 0; j < oMove.amount; j++) {
+            aStacks[oMove.from].pop();
+        }
+    }
+    return aStacks;
+}
+
+console.log("Part 2: " + getTops(moveCrates9001(createStacks())));
