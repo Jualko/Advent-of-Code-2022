@@ -14,17 +14,14 @@ const iStacks = Math.floor(aInput[0].length / 4 + 0.25);
 
 function createStacks() {
     let aStacks = [];
-    for (let i = 0; i < aCrateRows.length; i++) {
+    aCrateRows.forEach(row => {
         for (let j = 0; j < iStacks; j++) {
-            if (aStacks[j] === undefined) {
-                aStacks[j] = [];
-            }
-            const sCrate = aCrateRows[i][j * 4 + 1];
-            if (sCrate && sCrate.trim()) {
+            aStacks[j] = aStacks[j] || [];
+            if (sCrate = row[j * 4 + 1].trim()) {
                 aStacks[j].unshift(sCrate);
             }
         }
-    }
+    });
     return aStacks;
 }
 
