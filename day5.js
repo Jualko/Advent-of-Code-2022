@@ -1,8 +1,6 @@
 const fs = require('fs');
 const aInput = fs.readFileSync('day5input.txt', 'utf8').split("\r\n");
 
-//Part 1: After the rearrangement procedure completes, what crate ends up on top of each stack?
-
 const iDivider = aInput.indexOf("");
 const aMoves = aInput.slice(iDivider + 1, aInput.length).map(m => {
     return {
@@ -30,37 +28,35 @@ function createStacks() {
     return aStacks;
 }
 
-function moveCrates9000(aStacks){
-    for (let i = 0; i < aMoves.length; i++) {
-        const oMove = aMoves[i];
-        for (let j = 0; j < oMove.amount; j++) {
-            aStacks[oMove.to].push(aStacks[oMove.from][aStacks[oMove.from].length - 1]);
-            aStacks[oMove.from].pop();
-        }
-    }
-    return aStacks;
+function getTops(aStacks) {
+    return aStacks.map(s => s[s.length - 1]).join('');
 }
 
-function getTops(aStacks){
-    let sTops = "";
-    aStacks.forEach(s => { sTops += s[s.length - 1] })
-    return sTops;
+//Part 1: After the rearrangement procedure completes, what crate ends up on top of each stack?
+
+function moveCrates9000(aStacks) {
+    aMoves.forEach(m => {
+        for (let j = 0; j < m.amount; j++) {
+            aStacks[m.to].push(aStacks[m.from][aStacks[m.from].length - 1]);
+            aStacks[m.from].pop();
+        }
+    });
+    return aStacks;
 }
 
 console.log("Part 1: " + getTops(moveCrates9000(createStacks())));
 
 //Part 2: After the rearrangement procedure completes, what crate ends up on top of each stack?
 
-function moveCrates9001(aStacks){
-    for (let i = 0; i < aMoves.length; i++) {
-        const oMove = aMoves[i];
-        for (let j = oMove.amount; j > 0; j--) {
-            aStacks[oMove.to].push(aStacks[oMove.from][aStacks[oMove.from].length - j]);
+function moveCrates9001(aStacks) {
+    aMoves.forEach(m => {
+        for (let j = m.amount; j > 0; j--) {
+            aStacks[m.to].push(aStacks[m.from][aStacks[m.from].length - j]);
         }
-        for (let j = 0; j < oMove.amount; j++) {
-            aStacks[oMove.from].pop();
+        for (let j = 0; j < m.amount; j++) {
+            aStacks[m.from].pop();
         }
-    }
+    });
     return aStacks;
 }
 
