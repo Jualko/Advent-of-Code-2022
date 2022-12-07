@@ -1,6 +1,7 @@
 const fs = require('fs');
 const aTerminalOutput = fs.readFileSync('day7input.txt', 'utf8').split("\r\n");
 
+const iTotalDiskSpace = 70000000;
 let oDirectories = {};
 let sCurrentDirectory = "";
 
@@ -64,3 +65,27 @@ function getSumOfSizesOfDirectoriesWithMaxSize(iMaxSize) {
 }
 
 console.log(getSumOfSizesOfDirectoriesWithMaxSize(100000));
+
+//Part 2: Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. What is the total size of that directory?
+
+function getSizeOfDirectoryToDeleteByNeededSpace(iNeededUnusedSpace) {
+    let outermostDirectorySize =
+        oDirectories[Object.keys(oDirectories).reduce((a, e) => {
+            if (a.split("-").length < e.split("-").length) {
+                return a;
+            } else {
+                return e;
+            }
+        })].size;
+    let iUnusedSpace = iTotalDiskSpace - outermostDirectorySize;
+    let iSpaceToDelete = iNeededUnusedSpace - iUnusedSpace;
+    return oDirectories[Object.keys(oDirectories).reduce((a, e) => {
+        if (oDirectories[e].size >= iSpaceToDelete && oDirectories[e].size < oDirectories[a].size) {
+            return e;
+        } else {
+            return a;
+        }
+    })].size;
+}
+
+console.log(getSizeOfDirectoryToDeleteByNeededSpace(30000000));
