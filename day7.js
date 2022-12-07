@@ -1,91 +1,67 @@
 const fs = require('fs');
 const aTerminalOutput = fs.readFileSync('day7input.txt', 'utf8').split("\r\n");
 
+const sSplitChar = "/";
 const iTotalDiskSpace = 70000000;
 let oDirectories = {};
-let sCurrentDirectory = "";
 
-function createDirectory(sDirectory) {
-    if (!oDirectories[sDirectory]) {
-        oDirectories[sDirectory] = {
-            "size": 0,
-            "files": [],
-            "subdirectories": []
-        };
-    }
-}
-
-function getParentDirectoy(sDirectory) {
-    if (sDirectory) {
-        if (sDirectory.split("-").length > 1) {
-            return sDirectory.split("-").slice(0, -1).join("-");
-        } else {
-            return undefined
-        }
-    }
-}
-
-function addFileSizeToParentDirectories(sDirectory, iSize) {
-    if (sDirectory) {
-        oDirectories[sDirectory].size += iSize;
-        addFileSizeToParentDirectories(getParentDirectoy(sDirectory), iSize);
-    }
-}
-
-for (let i = 0; i < aTerminalOutput.length; i++) {
-    const element = aTerminalOutput[i].split(" ");
-    if (element[0] === "$") {
-        if (element[1] === "cd") {
-            if (element[2] === "..") {
+function initDirectory(aCommands) {
+    let sCurrentDirectory;
+    aCommands.forEach(c => {
+        c = c.split(" ");
+        if (c[1] === "cd") {
+            if (c[2] === "..") {
                 sCurrentDirectory = getParentDirectoy(sCurrentDirectory);
             } else {
-                if (sCurrentDirectory) {
-                    sCurrentDirectory += "-" + element[2];
-                }
-                else {
-                    sCurrentDirectory = element[2];
-                }
-                createDirectory(sCurrentDirectory);
+                sCurrentDirectory = sCurrentDirectory ? sCurrentDirectory + sSplitChar + c[2] : c[2];
+                oDirectories[sCurrentDirectory] = 0;
             }
+        } else if (iFileSize = parseInt(c[0])) {
+            addFileSizeToDirectories(sCurrentDirectory, iFileSize);
         }
-    } else if (element[0] === "dir") {
-        oDirectories[sCurrentDirectory].subdirectories.push(element[1]);
-    } else { //file
-        oDirectories[sCurrentDirectory].files.push(element[1]);
-        addFileSizeToParentDirectories(sCurrentDirectory, parseInt(element[0]));
+    });
+}
+
+function getParentDirectoy(sDir) {
+    if (sDir && sDir.includes(sSplitChar)) {
+        return sDir.split(sSplitChar).slice(0, -1).join(sSplitChar);
     }
 }
+
+function addFileSizeToDirectories(sDir, iSize) {
+    if (sDir) {
+        oDirectories[sDir] += iSize;
+        addFileSizeToDirectories(getParentDirectoy(sDir), iSize);
+    }
+}
+
+initDirectory(aTerminalOutput);
 
 //Part 1: Find all of the directories with a total size of at most 100000. What is the sum of the total sizes of those directories?
 
-function getSumOfSizesOfDirectoriesWithMaxSize(iMaxSize) {
-    return Object.values(oDirectories)
-        .filter((e) => e.size <= iMaxSize)
-        .reduce((a, e) => a + e.size, 0);
-}
-
-console.log(getSumOfSizesOfDirectoriesWithMaxSize(100000));
+console.log("Part 1: " + Object.values(oDirectories).filter((e) => e <= 100000).reduce((a, e) => a + e, 0));
 
 //Part 2: Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. What is the total size of that directory?
 
-function getSizeOfDirectoryToDeleteByNeededSpace(iNeededUnusedSpace) {
-    let outermostDirectorySize =
-        oDirectories[Object.keys(oDirectories).reduce((a, e) => {
-            if (a.split("-").length < e.split("-").length) {
-                return a;
-            } else {
-                return e;
-            }
-        })].size;
-    let iUnusedSpace = iTotalDiskSpace - outermostDirectorySize;
-    let iSpaceToDelete = iNeededUnusedSpace - iUnusedSpace;
-    return oDirectories[Object.keys(oDirectories).reduce((a, e) => {
-        if (oDirectories[e].size >= iSpaceToDelete && oDirectories[e].size < oDirectories[a].size) {
+function getDirectoryByNeededSpace(iNeededSpace) {
+    let iSpaceToDelete = iNeededSpace - (iTotalDiskSpace - oDirectories[getRootDirectory()]);
+    return Object.keys(oDirectories).reduce((a, e) => {
+        if (oDirectories[e] >= iSpaceToDelete && oDirectories[e] < oDirectories[a]) {
             return e;
         } else {
             return a;
         }
-    })].size;
+    });
 }
 
-console.log(getSizeOfDirectoryToDeleteByNeededSpace(30000000));
+function getRootDirectory(){
+    return Object.keys(oDirectories).reduce((a, e) => {
+        if (a.split(sSplitChar).length < e.split(sSplitChar).length) {
+            return a;
+        } else {
+            return e;
+        }
+    });
+}
+
+console.log("Part 2: " + oDirectories[getDirectoryByNeededSpace(30000000)]);
