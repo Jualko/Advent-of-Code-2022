@@ -34,9 +34,10 @@ function getTailVisitedPositions(iKnots) {
                     aKnots[i].y += 1 * Math.sign(oVector.y);
                 }
             }
-            oPositions.add(aKnots[aKnots.length - 1].x + "-" + aKnots[aKnots.length - 1].y);
+            oPositions.add(aKnots[aKnots.length - 1].x + "," + aKnots[aKnots.length - 1].y);
         }
     });
+    console.log(oPositions)
     return oPositions;
 }
 
