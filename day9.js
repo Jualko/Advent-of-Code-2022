@@ -1,17 +1,13 @@
 const fs = require('fs');
 const aMotions = fs.readFileSync('day9input.txt', 'utf8').split("\r\n").map(m => m.split(" "));
 
-let oHead = { x: 0, y: 0 };
-let oTail = { x: 0, y: 0 };
-let oPositions = new Set();
-
 //Part 1: Simulate your complete hypothetical series of motions. How many positions does the tail of the rope visit at least once?
 
-function moveRope() {
-    console.log("== Initial State ==");
-    console.log("Head: ", oHead);
-    console.log("Tail: ", oTail);
-    console.log("");
+function moveRope(iKnots) {
+    let oPositions = new Set();
+    let aKnots = getKnots(iKnots);
+    let oHead = aKnots[0];
+
     aMotions.forEach(m => {
         console.log("==", m[0], m[1], "==");
         for (let i = 0; i < m[1]; i++) {
@@ -30,39 +26,60 @@ function moveRope() {
                     break;
             }
             console.log("Head: ", oHead);
-            moveTail();
-            oPositions.add(oTail.x + "-" + oTail.y);
-            console.log("Tail: ", oTail);
+
+            for (let i = 1; i < aKnots.length; i++) {
+                const oKnot = aKnots[i];
+                const oVector = getVector(aKnots[i - 1], aKnots[i]);
+                console.log("vector", oVector)
+                if (!isTouching(oVector)) {
+                    moveTail(aKnots[i], oVector);
+                    console.log("move knot",i)
+                } else {
+                    console.log("knot",i, "touching",i-1||"head");
+                }
+            }
+            console.log("Rope", aKnots);
             console.log("");
+
+            oPositions.add(aKnots[aKnots.length - 1].x + "-" + aKnots[aKnots.length - 1].y);
         }
     });
+    return oPositions.size;
 }
 
-function moveTail() {
-    if (!isTouching()) {
-        const oVector = getVector();
-        console.log("Motion-Vector:", oVector);
-        if (oVector.x === 0) {
-            oTail.y += 1 * Math.sign(oVector.y);
-        }
-        else if (oVector.y === 0) {
-            oTail.x += 1 * Math.sign(oVector.x);
-        } else {
-            oTail.x += 1 * Math.sign(oVector.x);
-            oTail.y += 1 * Math.sign(oVector.y);
-        }
+function getKnots(iKnots) {
+    console.log("== Initial State ==");
+    let aKnots = [{ x: 0, y: 0 }]; //head
+    for (let i = 0; i < iKnots - 1; i++) {
+        aKnots.push({ x: 0, y: 0 });
+    }
+    console.log("Rope", aKnots);
+    console.log("");
+    return aKnots
+}
+
+function moveTail(oT, oV) {
+    if (oV.x === 0) {
+        oT.y += 1 * Math.sign(oV.y);
+    }
+    else if (oV.y === 0) {
+        oT.x += 1 * Math.sign(oV.x);
     } else {
-        console.log("tail touching head");
+        oT.x += 1 * Math.sign(oV.x);
+        oT.y += 1 * Math.sign(oV.y);
     }
 };
 
-function isTouching() {
-    return (oTail.x === oHead.x && oTail.y === oHead.y) || (oTail.y === oHead.y && (oTail.x === oHead.x - 1 || oTail.x === oHead.x + 1)) || (oTail.x === oHead.x && (oTail.y === oHead.y - 1 || oTail.y === oHead.y + 1)) || (oTail.x === oHead.x - 1 || oTail.x === oHead.x + 1) && (oTail.y === oHead.y - 1 || oTail.y === oHead.y + 1);
+function isTouching(oVector) {
+    return Math.abs(oVector.x) < 2 && Math.abs(oVector.y) < 2;
 };
 
-function getVector() {
-    return { x: oHead.x - oTail.x, y: oHead.y - oTail.y };
+function getVector(oH, oT) {
+    return { x: oH.x - oT.x, y: oH.y - oT.y };
 }
 
-moveRope();
-console.log("Part 1:", oPositions.size)
+console.log("Part 1:", moveRope(2));
+
+//Part 2: Simulate your complete series of motions on a larger rope with ten knots. How many positions does the tail of the rope visit at least once?
+
+console.log("Part 2:", moveRope(10));
