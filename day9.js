@@ -37,7 +37,6 @@ function getTailVisitedPositions(iKnots) {
             oPositions.add(aKnots[aKnots.length - 1].x + "," + aKnots[aKnots.length - 1].y);
         }
     });
-    console.log(oPositions)
     return oPositions;
 }
 
