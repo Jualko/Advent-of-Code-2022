@@ -13,20 +13,7 @@ function getTailVisitedPositions(iKnots) {
 
     aMotions.forEach(m => {
         for (let i = 0; i < m[1]; i++) {
-            switch (m[0]) {
-                case "R":
-                    aKnots[0].x += 1;
-                    break;
-                case "L":
-                    aKnots[0].x -= 1;
-                    break;
-                case "U":
-                    aKnots[0].y += 1;
-                    break;
-                case "D":
-                    aKnots[0].y -= 1;
-                    break;
-            }
+            aKnots[0][{ R: "x", U: "y", L: "x", D: "y" }[m[0]]] += { R: 1, U: 1, L: -1, D: -1 }[m[0]];
             for (let i = 1; i < aKnots.length; i++) {
                 const oVector = { x: aKnots[i - 1].x - aKnots[i].x, y: aKnots[i - 1].y - aKnots[i].y };
                 if (Math.abs(oVector.x) > 1 || Math.abs(oVector.y) > 1) {
