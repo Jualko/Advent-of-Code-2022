@@ -1,64 +1,62 @@
 const fs = require('fs');
-const aMonkeys = fs.readFileSync('day11input.txt', 'utf8').split("\r\n\r\n").map(e => e.split("\r\n"));
+const aInput = fs.readFileSync('day11input.txt', 'utf8').split("\r\n\r\n").map(e => e.split("\r\n"));
 
 function getMonkeys() {
-    let oMonkeys = {};
-    aMonkeys.forEach((e, i) => {
+    let aMonkeys = [];
+    aInput.forEach((e, i) => {
         e.forEach((m, j) => {
             switch (j) {
                 case 1:
-                    oMonkeys[i] = { counted: 0 };
-                    oMonkeys[i].items = m.split(" ").slice(4).join("").split(",").map(g => parseInt(g));
+                    aMonkeys[i] = { counted: 0 };
+                    aMonkeys[i].items = m.split(" ").slice(4).join("").split(",").map(g => parseInt(g));
                     break;
                 case 2:
-                    oMonkeys[i].operation = m.split(" ").slice(5).join("");
+                    aMonkeys[i].operation = m.split(" ").slice(5).join("");
                     break;
                 case 3:
-                    oMonkeys[i].test = parseInt(m.split(" ").slice(-1)[0]);
+                    aMonkeys[i].test = parseInt(m.split(" ").slice(-1)[0]);
                     break;
                 case 4:
-                    oMonkeys[i].true = parseInt(m.split(" ").slice(-1)[0]);
+                    aMonkeys[i].true = parseInt(m.split(" ").slice(-1)[0]);
                     break;
                 case 5:
-                    oMonkeys[i].false = parseInt(m.split(" ").slice(-1)[0]);
+                    aMonkeys[i].false = parseInt(m.split(" ").slice(-1)[0]);
                     break;
                 default:
                     break;
             }
         })
     })
-    return oMonkeys;
+    return aMonkeys;
 }
 
 //Part 1: Figure out which monkeys to chase by counting how many items they inspect over 20 rounds. What is the level of monkey business after 20 rounds of stuff-slinging simian shenanigans?
+//Part 2: Worry levels are no longer divided by three after each item is inspected; you'll need to find another way to keep your worry levels manageable. Starting again from the initial state in your puzzle input, what is the level of monkey business after 10000 rounds?
 
-function monkeyBusiness() {
-    let oMonkeys = getMonkeys();
-    for (let i = 0; i < 20; i++) {
-        for (let j = 0; j < Object.keys(oMonkeys).length; j++) {
-            const oMonkey = oMonkeys[j];
+function monkeyBusiness(iRounds, iRelief) {
+    let aMonkeys = getMonkeys();
+    for (let i = 0; i < iRounds; i++) {
+        for (let j = 0; j < Object.keys(aMonkeys).length; j++) {
+            const oMonkey = aMonkeys[j];
             oMonkey.items.forEach(old => {
-                let iNew = Math.floor(eval(oMonkey.operation) / 3);
+                let iNew = Math.floor(eval(eval(oMonkey.operation) / iRelief));
                 if (iNew % oMonkey.test === 0) {
-                    oMonkeys[oMonkey.true].items.push(iNew);
+                    aMonkeys[oMonkey.true].items.push(iNew);
                 } else {
-                    oMonkeys[oMonkey.false].items.push(iNew);
+                    aMonkeys[oMonkey.false].items.push(iNew);
                 }
                 oMonkey.counted++;
             });
             oMonkey.items = [];
         }
     }
-    return oMonkeys;
+    return aMonkeys;
 }
 
-function getMoneyBusinessLevel(oMonkeys) {
-    let aCounted = [];
-    for (const key in oMonkeys) {
-        aCounted.push(oMonkeys[key].counted);
-    }
-    aCounted = aCounted.sort((a, b) => b - a);
+function getMoneyBusinessLevel(aMonkeys) {
+    let aCounted = aMonkeys.map(e => e.counted).sort((a, b) => b - a);
     return aCounted[0] * aCounted[1];
 }
 
-console.log("Part 1:", getMoneyBusinessLevel(monkeyBusiness()));
+console.log("Part 1:", getMoneyBusinessLevel(monkeyBusiness(20, 3)));
+console.log("Part 2:", getMoneyBusinessLevel(monkeyBusiness(10000, 1)));
