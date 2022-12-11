@@ -1,32 +1,17 @@
 const fs = require('fs');
-const aInput = fs.readFileSync('day11input.txt', 'utf8').split("\r\n\r\n").map(e => e.split("\r\n"));
+const aInput = fs.readFileSync('day11input.txt', 'utf8').split("\r\n\r\n");
 
 function getMonkeys() {
     let aMonkeys = [];
     aInput.forEach((e, i) => {
-        e.forEach((m, j) => {
-            switch (j) {
-                case 1:
-                    aMonkeys[i] = { counted: 0 };
-                    aMonkeys[i].items = m.split(" ").slice(4).join("").split(",").map(g => parseInt(g));
-                    break;
-                case 2:
-                    aMonkeys[i].operation = m.split(" ").slice(5).join("");
-                    break;
-                case 3:
-                    aMonkeys[i].test = parseInt(m.split(" ").slice(-1)[0]);
-                    break;
-                case 4:
-                    aMonkeys[i].true = parseInt(m.split(" ").slice(-1)[0]);
-                    break;
-                case 5:
-                    aMonkeys[i].false = parseInt(m.split(" ").slice(-1)[0]);
-                    break;
-                default:
-                    break;
-            }
-        })
-    })
+        aLines = e.split("\r\n")
+        aMonkeys[i] = { counted: 0 };
+        aMonkeys[i].items = aLines[1].split(" ").slice(4).join("").split(",").map(g => parseInt(g));
+        aMonkeys[i].operation = aLines[2].split(" ").slice(5).join("");
+        aMonkeys[i].test = parseInt(aLines[3].split(" ").slice(-1)[0]);
+        aMonkeys[i].true = parseInt(aLines[4].split(" ").slice(-1)[0]);
+        aMonkeys[i].false = parseInt(aLines[5].slice(-1)[0]);
+    });
     return aMonkeys;
 }
 
@@ -35,21 +20,16 @@ function getMonkeys() {
 
 function monkeyBusiness(iRounds, iPart) {
     let aMonkeys = getMonkeys();
-    let sRelief = iPart === 1 ? "/3" : "%" + aMonkeys.reduce((acc, m) => acc *= m.test, 1);
+    const sRelief = iPart === 1 ? "/3" : "%" + aMonkeys.reduce((acc, m) => acc *= m.test, 1);
     for (let i = 0; i < iRounds; i++) {
-        for (let j = 0; j < Object.keys(aMonkeys).length; j++) {
-            const oMonkey = aMonkeys[j];
+        aMonkeys.forEach(oMonkey => {
             oMonkey.items.forEach(old => {
-                let iNew = Math.floor(eval(eval(oMonkey.operation) + sRelief));
-                if (iNew % oMonkey.test === 0) {
-                    aMonkeys[oMonkey.true].items.push(iNew);
-                } else {
-                    aMonkeys[oMonkey.false].items.push(iNew);
-                }
+                const iNew = Math.floor(eval(eval(oMonkey.operation) + sRelief));
+                aMonkeys[oMonkey[iNew % oMonkey.test === 0 ? 'true' : 'false']].items.push(iNew);
                 oMonkey.counted++;
             });
             oMonkey.items = [];
-        }
+        });
     }
     return aMonkeys;
 }
