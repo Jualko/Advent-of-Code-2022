@@ -33,13 +33,14 @@ function getMonkeys() {
 //Part 1: Figure out which monkeys to chase by counting how many items they inspect over 20 rounds. What is the level of monkey business after 20 rounds of stuff-slinging simian shenanigans?
 //Part 2: Worry levels are no longer divided by three after each item is inspected; you'll need to find another way to keep your worry levels manageable. Starting again from the initial state in your puzzle input, what is the level of monkey business after 10000 rounds?
 
-function monkeyBusiness(iRounds, iRelief) {
+function monkeyBusiness(iRounds, iPart) {
     let aMonkeys = getMonkeys();
+    let sRelief = iPart === 1 ? "/3" : "%" + aMonkeys.reduce((acc, m) => acc *= m.test, 1);
     for (let i = 0; i < iRounds; i++) {
         for (let j = 0; j < Object.keys(aMonkeys).length; j++) {
             const oMonkey = aMonkeys[j];
             oMonkey.items.forEach(old => {
-                let iNew = Math.floor(eval(eval(oMonkey.operation) / iRelief));
+                let iNew = Math.floor(eval(eval(oMonkey.operation) + sRelief));
                 if (iNew % oMonkey.test === 0) {
                     aMonkeys[oMonkey.true].items.push(iNew);
                 } else {
@@ -58,5 +59,5 @@ function getMoneyBusinessLevel(aMonkeys) {
     return aCounted[0] * aCounted[1];
 }
 
-console.log("Part 1:", getMoneyBusinessLevel(monkeyBusiness(20, 3)));
-console.log("Part 2:", getMoneyBusinessLevel(monkeyBusiness(10000, 1)));
+console.log("Part 1:", getMoneyBusinessLevel(monkeyBusiness(20, 1)));
+console.log("Part 2:", getMoneyBusinessLevel(monkeyBusiness(10000, 2)));
